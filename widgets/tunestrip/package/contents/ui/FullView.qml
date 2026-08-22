@@ -169,12 +169,18 @@ Item {
             Layout.fillWidth: true
             spacing: Kirigami.Units.smallSpacing
             visible: Plasmoid.configuration.popupVolume && full.hasTrack
+                     && full.backend && full.backend.canChangeVolume
 
             Kirigami.Icon {
                 implicitWidth: Kirigami.Units.iconSizes.small
                 implicitHeight: Kirigami.Units.iconSizes.small
-                source: full.backend && full.backend.volume < 0.01
-                        ? "audio-volume-muted" : "audio-volume-high"
+                source: {
+                    if (!full.backend || full.backend.muted || full.backend.volume < 0.01)
+                        return "audio-volume-muted"
+                    if (full.backend.volume < 0.35)
+                        return "audio-volume-low"
+                    return full.backend.volume < 0.7 ? "audio-volume-medium" : "audio-volume-high"
+                }
                 opacity: 0.7
             }
 
@@ -184,6 +190,16 @@ Item {
                 from: 0
                 to: 1
                 onMoved: if (full.backend) full.backend.setVolume(value)
+            }
+
+            /* Which volume this is depends on what could be found: the
+               application's own stream, or the player's MPRIS level. */
+            PlasmaComponents.Label {
+                text: Math.round((full.backend ? full.backend.volume : 0) * 100) + "%"
+                opacity: 0.6
+                font: Kirigami.Theme.smallFont
+                horizontalAlignment: Text.AlignRight
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 2
             }
 
             Binding {

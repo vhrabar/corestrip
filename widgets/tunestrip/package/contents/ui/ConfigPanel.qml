@@ -66,6 +66,8 @@ KCM.SimpleKCM {
     property alias cfg_progressLine: progressBox.checked
     property alias cfg_hideWhenIdle: hideBox.checked
     property alias cfg_wheelVolume: wheelBox.checked
+    property string cfg_volumeTarget
+    property alias cfg_volumeStep: stepBox.value
     property alias cfg_middleClickPause: middleBox.checked
 
     Kirigami.FormLayout {
@@ -203,6 +205,45 @@ KCM.SimpleKCM {
         QQC2.CheckBox {
             id: wheelBox
             text: "Scroll wheel changes the volume"
+        }
+
+        QQC2.ComboBox {
+            id: targetBox
+            Kirigami.FormData.label: "Volume:"
+            enabled: wheelBox.checked
+            textRole: "label"
+            valueRole: "key"
+            model: [
+                { key: "app", label: "Of the application (what you hear)" },
+                { key: "player", label: "Of the player (MPRIS)" }
+            ]
+            currentIndex: Math.max(0, indexOfValue(page.cfg_volumeTarget))
+            onActivated: page.cfg_volumeTarget = currentValue
+        }
+
+        QQC2.Label {
+            text: page.cfg_volumeTarget === "app"
+                  ? "Moves the player's own sound in the mixer, so browsers obey too."
+                  : "Asks the player to change its volume; many report the level and ignore it."
+            opacity: 0.6
+            font: Kirigami.Theme.smallFont
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 20
+            wrapMode: Text.WordWrap
+        }
+
+        QQC2.SpinBox {
+            id: stepBox
+            Kirigami.FormData.label: "Step:"
+            enabled: wheelBox.checked
+            from: 1
+            to: 25
+            stepSize: 1
+            textFromValue: function (value) {
+                return value + " %"
+            }
+            valueFromText: function (text) {
+                return parseInt(text) || 5
+            }
         }
 
         QQC2.CheckBox {

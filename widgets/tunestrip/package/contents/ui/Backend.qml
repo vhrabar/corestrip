@@ -20,6 +20,8 @@ QtObject {
     property bool detailed: false
     /* Set by the panel when it draws a progress line. */
     property bool tracksPosition: false
+    /* "app" drives the player's audio stream, "player" its MPRIS volume. */
+    property string volumeTarget: "app"
 
     readonly property Mpris.Mpris2Model sources: Mpris.Mpris2Model {}
 
@@ -49,7 +51,26 @@ QtObject {
     readonly property bool canSeek: hasPlayer && player.canSeek && length > 0
     readonly property bool canRaise: hasPlayer && player.canRaise
 
-    readonly property real volume: hasPlayer ? player.volume : 0
+    /* Two levels answer to "volume": the one MPRIS carries, which many players
+       accept and then ignore, and the one PulseAudio keeps for the stream the
+       player feeds — the level the ear follows. The stream wins when it can be
+       found, and the MPRIS volume stands in when it cannot. */
+    readonly property real playerVolume: hasPlayer ? player.volume : 0
+    readonly property Loader streamLoader: Loader {
+        active: backend.volumeTarget === "app"
+        source: "StreamVolume.qml"
+        onLoaded: {
+            item.player = Qt.binding(function () { return backend.player })
+            item.playing = Qt.binding(function () { return backend.playing })
+        }
+    }
+    readonly property var streamControl: streamLoader.item
+    readonly property bool hasStream: streamControl !== null && streamControl !== undefined
+                                      && streamControl.available
+    readonly property bool usingStream: volumeTarget === "app" && hasStream
+    readonly property real volume: usingStream ? streamControl.volume : playerVolume
+    readonly property bool canChangeVolume: usingStream || hasPlayer
+    readonly property bool muted: usingStream && streamControl.muted
     readonly property bool shuffled: hasPlayer && player.shuffle === Mpris.ShuffleStatus.On
     readonly property int loop: hasPlayer ? player.loopStatus : Mpris.LoopStatus.None
 
@@ -141,13 +162,18 @@ QtObject {
     }
 
     function setVolume(value) {
+        var wanted = Math.max(0, Math.min(1, value))
+        if (usingStream) {
+            streamControl.setVolume(wanted)
+            return
+        }
         if (hasPlayer)
-            player.volume = Math.max(0, Math.min(1, value))
+            player.volume = wanted
     }
 
     function nudgeVolume(delta) {
-        if (hasPlayer)
-            player.volume = Math.max(0, Math.min(1, player.volume + delta))
+        if (canChangeVolume)
+            setVolume(volume + delta)
     }
 
     function toggleShuffle() {

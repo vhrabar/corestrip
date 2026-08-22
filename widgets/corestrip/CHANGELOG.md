@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0
+
+- Text size setting (50–150 %) that scales the readouts and the gauges
+  together, within what the panel thickness allows.
+
 ## 1.0.0
 
 First release.
@@ -15,5 +20,3 @@ First release.
   battery and the top processes by CPU or memory.
 - All readings come from `ksystemstats`; sensors only the popup needs stay
   unsubscribed until it opens.
-- Text size setting (50–150 %) that scales the readouts and the gauges
-  together, within what the panel thickness allows.

@@ -45,6 +45,13 @@
         <entry name="wheelVolume" type="Bool">
             <default>true</default>
         </entry>
+        <entry name="volumeTarget" type="String">
+            <!-- app: the player's audio stream, player: its MPRIS volume -->
+            <default>app</default>
+        </entry>
+        <entry name="volumeStep" type="Int">
+            <default>5</default>
+        </entry>
         <entry name="middleClickPause" type="Bool">
             <default>true</default>
         </entry>

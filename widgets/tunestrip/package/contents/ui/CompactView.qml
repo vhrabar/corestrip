@@ -31,6 +31,7 @@ MouseArea {
     property bool progressLine: Plasmoid.configuration.progressLine
     property bool hideWhenIdle: Plasmoid.configuration.hideWhenIdle
     property bool wheelVolume: Plasmoid.configuration.wheelVolume
+    property int volumeStep: Plasmoid.configuration.volumeStep
     property bool middleClickPause: Plasmoid.configuration.middleClickPause
 
     property string visualizerStyle: Plasmoid.configuration.visualizerStyle
@@ -107,13 +108,28 @@ MouseArea {
         compact.toggleRequested()
     }
 
+    /* Wheel over the strip is the volume. Fine-grained wheels report the turn
+       in fractions of a notch, so the turn is added up and a step is spent
+       only once a whole notch has gone by. */
+    property real wheelCarry: 0
+
     onWheel: function (wheel) {
-        if (!wheelVolume || !backend) {
+        if (!wheelVolume || !backend || !backend.canChangeVolume) {
             wheel.accepted = false
             return
         }
-        var steps = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x
-        backend.nudgeVolume(steps > 0 ? 0.04 : -0.04)
+        var turn = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x
+        if (turn === 0)
+            return
+        wheelCarry += turn
+        /* A notch is 120 units; the nudge below rounds the count towards zero
+           and leaves the remainder for the next turn of the wheel. */
+        var notches = wheelCarry > 0 ? Math.floor(wheelCarry / 120) : Math.ceil(wheelCarry / 120)
+        if (notches === 0)
+            return
+        wheelCarry -= notches * 120
+        backend.nudgeVolume(notches * Math.max(1, volumeStep) / 100)
+        volumeFlash.show()
     }
 
     implicitWidth: collapsed ? 0 : content.implicitWidth
@@ -221,6 +237,91 @@ MouseArea {
                 color: compact.visualizerColor
                 opacity: 0.9
             }
+        }
+    }
+
+    /* A scroll changes something heard, not something seen, so the strip says
+       what it did: the level over the whole widget for a moment, and nothing
+       at all the rest of the time. */
+    Rectangle {
+        id: volumeFlash
+
+        readonly property real level: compact.backend ? compact.backend.volume : 0
+        readonly property int textSize: Math.round(Math.max(8, Math.min(compact.available * 0.5,
+                                                                        compact.titleSize)))
+        readonly property bool roomForLabel: width >= label.implicitWidth + Kirigami.Units.smallSpacing * 2
+                                             && height >= textSize * 1.6
+
+        anchors.fill: parent
+        z: 2
+        radius: Kirigami.Units.cornerRadius
+        color: Kirigami.Theme.backgroundColor
+        opacity: 0
+        visible: opacity > 0
+
+        function show() {
+            opacity = 0.94
+            hold.restart()
+        }
+
+        Behavior on opacity {
+            NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
+        }
+
+        Timer {
+            id: hold
+            interval: 1200
+            onTriggered: volumeFlash.opacity = 0
+        }
+
+        Row {
+            anchors.centerIn: parent
+            spacing: Math.round(Kirigami.Units.smallSpacing / 2)
+            visible: volumeFlash.roomForLabel
+
+            Kirigami.Icon {
+                width: volumeFlash.textSize
+                height: width
+                anchors.verticalCenter: parent.verticalCenter
+                source: volumeFlash.level < 0.01
+                        ? "audio-volume-muted"
+                        : (volumeFlash.level < 0.35
+                           ? "audio-volume-low"
+                           : (volumeFlash.level < 0.7 ? "audio-volume-medium" : "audio-volume-high"))
+            }
+
+            Text {
+                id: label
+                anchors.verticalCenter: parent.verticalCenter
+                text: Math.round(volumeFlash.level * 100) + "%"
+                color: Kirigami.Theme.textColor
+                font.pixelSize: volumeFlash.textSize
+                font.weight: Font.DemiBold
+                font.family: Kirigami.Theme.defaultFont.family
+            }
+        }
+
+        /* The bar carries the reading on its own where the label does not fit
+           — a vertical panel, or a strip the thickness of an icon. */
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.margins: 1
+            height: Math.max(2, Math.round(compact.available * 0.08))
+            radius: height / 2
+            color: Kirigami.Theme.textColor
+            opacity: 0.18
+        }
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            anchors.margins: 1
+            width: Math.round((parent.width - 2) * Math.max(0, Math.min(1, volumeFlash.level)))
+            height: Math.max(2, Math.round(compact.available * 0.08))
+            radius: height / 2
+            color: compact.visualizerColor
         }
     }
 

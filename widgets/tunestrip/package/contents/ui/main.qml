@@ -14,6 +14,7 @@ PlasmoidItem {
     readonly property Backend backend: Backend {
         detailed: root.expanded
         tracksPosition: Plasmoid.configuration.progressLine
+        volumeTarget: Plasmoid.configuration.volumeTarget
     }
 
     preferredRepresentation: Plasmoid.formFactor === PlasmaCore.Types.Planar

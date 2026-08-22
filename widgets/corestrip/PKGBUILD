@@ -3,7 +3,7 @@
 # Builds from this checkout: run makepkg in this directory.
 # For the AUR package see packaging/aur/.
 pkgname=plasma6-applets-corestrip
-pkgver=1.0.0
+pkgver=1.1.0
 pkgrel=1
 pkgdesc="Plasma 6 panel widget for CPU, GPU, memory and network load"
 arch=('any')

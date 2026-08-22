@@ -21,6 +21,18 @@ players when more than one is running.
 The scroll wheel over the widget changes the volume and a middle click plays or
 pauses — both can be switched off.
 
+## About the volume
+
+MPRIS carries a volume, but for most of what people play it is decoration:
+browsers and Spotify report 100 % for ever and ignore what is written to it.
+So the wheel moves the level that is actually heard — the one PulseAudio keeps
+for the player's own audio stream, the same slider the mixer shows.
+
+The stream is matched to the player on screen by process id, then by name, and
+finally by "one player is playing and one application is making sound". When
+nothing matches — a phone over KDE Connect, Spotify Connect on another box —
+the MPRIS volume is used instead, and the settings can force that.
+
 ## Where the data comes from
 
 MPRIS2 on the session bus, the same interface Plasma's own media controls read.
@@ -49,7 +61,8 @@ album art, the accent colour or the text colour.
 
 - **Panel** — what to show and in which order, text size, title width, the
   second line with the artist, scrolling titles, the progress line, collapsing
-  when nothing plays, wheel and middle-click behaviour.
+  when nothing plays, wheel and middle-click behaviour, which volume the wheel
+  moves and by how much per notch.
 - **Equalizer** — style, columns, speed, colour, whether it keeps moving while
   paused. The page shows a live preview.
 - **Popup** — album art, equalizer, seek bar, volume, player list.
