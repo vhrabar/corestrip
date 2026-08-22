@@ -213,8 +213,9 @@ KCM.SimpleKCM {
             enabled: wheelBox.checked
             textRole: "label"
             valueRole: "key"
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 15
             model: [
-                { key: "app", label: "Of the application (what you hear)" },
+                { key: "app", label: "Of the application" },
                 { key: "player", label: "Of the player (MPRIS)" }
             ]
             currentIndex: Math.max(0, indexOfValue(page.cfg_volumeTarget))
