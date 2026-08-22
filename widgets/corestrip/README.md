@@ -105,7 +105,7 @@ release, so the file on the store and the file on the release page are the
 same build.
 
 For Arch/Manjaro users, [packaging/aur/](packaging/aur/) holds a ready
-`PKGBUILD` and `.SRCINFO` pinned to the v1.0.0 release tarball — copy both into
+`PKGBUILD` and `.SRCINFO` pinned to the v1.1.0 release tarball — copy both into
 a clone of the AUR repository and push. Once published, Manjaro's *Add/Remove
 Software* installs it like any other package when AUR support is enabled.
 

@@ -1,0 +1,12 @@
+pkgbase = plasma6-applets-daystrip
+	pkgdesc = Plasma 6 panel widget for the clock, date, weather and calendar
+	pkgver = 1.0.0
+	pkgrel = 1
+	url = https://github.com/stektus/corestrip
+	arch = any
+	license = MIT
+	depends = plasma-workspace
+	source = plasma6-applets-daystrip-1.0.0.tar.gz::https://github.com/stektus/corestrip/archive/refs/tags/v1.1.0.tar.gz
+	sha256sums = e9359a6d7371ce6d509c7c391e0ba005d24f03911a017a619c89bce42bf019ba
+
+pkgname = plasma6-applets-daystrip

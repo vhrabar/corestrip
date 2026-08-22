@@ -1,13 +1,14 @@
 # Maintainer: stektus <stektus@users.noreply.github.com>
 #
-# Template for publishing to the AUR. Before the first push:
-#   1. tag a release (v$pkgver) so the tarball below exists,
-#   2. run `updpkgsums` to replace the SKIP checksum with the real one,
-#   3. run `makepkg --printsrcinfo > .SRCINFO`,
-#   4. commit PKGBUILD and .SRCINFO to
-#      ssh://aur@aur.archlinux.org/plasma6-applets-daystrip.git
+# Ready to publish to the AUR: copy this file and .SRCINFO into a clone of
+# ssh://aur@aur.archlinux.org/plasma6-applets-daystrip.git and push.
+#
+# The repository holds several widgets, so the tarball is the repository
+# release ($_tag) while pkgver is the widget's own version. On a new release
+# bump both, then run `updpkgsums` and `makepkg --printsrcinfo > .SRCINFO`.
 #
 pkgname=plasma6-applets-daystrip
+_tag=v1.1.0
 pkgver=1.0.0
 pkgrel=1
 pkgdesc="Plasma 6 panel widget for the clock, date, weather and calendar"
@@ -15,11 +16,11 @@ arch=('any')
 url="https://github.com/stektus/corestrip"
 license=('MIT')
 depends=('plasma-workspace')
-source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('SKIP')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/$_tag.tar.gz")
+sha256sums=('e9359a6d7371ce6d509c7c391e0ba005d24f03911a017a619c89bce42bf019ba')
 
 package() {
-    cd "$srcdir/${url##*/}-$pkgver/widgets/daystrip"
+    cd "$srcdir/${url##*/}-${_tag#v}/widgets/daystrip"
 
     local appletdir="$pkgdir/usr/share/plasma/plasmoids/io.github.stektus.daystrip"
     install -dm755 "$appletdir"
@@ -27,6 +28,6 @@ package() {
     find "$appletdir" -type f -exec chmod 644 {} +
     find "$appletdir" -type d -exec chmod 755 {} +
 
-    install -Dm644 "$srcdir/${url##*/}-$pkgver/LICENSE" \
+    install -Dm644 "$srcdir/${url##*/}-${_tag#v}/LICENSE" \
         "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }

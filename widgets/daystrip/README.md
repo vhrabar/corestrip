@@ -86,7 +86,7 @@ package/           the Plasma package (metadata.json + contents/)
   contents/ui/     QML: main.qml, Backend.qml, views and components
   contents/code/   util.js (formatting) and ical.js (the iCalendar reader)
   contents/config/ KConfigXT schema and config page list
-packaging/aur/     PKGBUILD for the AUR
+packaging/aur/     PKGBUILD and .SRCINFO for the AUR
 PKGBUILD           builds a system-wide package from this checkout
 docs/              screenshots and the product logo
 ```

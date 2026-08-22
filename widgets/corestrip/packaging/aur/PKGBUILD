@@ -3,12 +3,12 @@
 # Ready to publish to the AUR: copy this file and .SRCINFO into a clone of
 # ssh://aur@aur.archlinux.org/plasma6-applets-corestrip.git and push.
 #
-# When releasing a new version, bump pkgver, then run `updpkgsums` and
-# `makepkg --printsrcinfo > .SRCINFO` again. Note that from the release after
-# v1.0.0 the sources live in widgets/corestrip/ inside the tarball, so the
-# package() paths need the extra prefix.
+# The repository holds several widgets, so the tarball is the repository
+# release ($_tag) while pkgver is the widget's own version. On a new release
+# bump both, then run `updpkgsums` and `makepkg --printsrcinfo > .SRCINFO`.
 #
 pkgname=plasma6-applets-corestrip
+_tag=v1.1.0
 pkgver=1.1.0
 pkgrel=1
 pkgdesc="Plasma 6 panel widget for CPU, GPU, memory and network load"
@@ -17,11 +17,11 @@ url="https://github.com/stektus/corestrip"
 license=('MIT')
 depends=('plasma-workspace' 'ksystemstats' 'libksysguard')
 optdepends=('nvidia-utils: NVIDIA GPU readings')
-source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('6c0c5dd13f7d7298d1af7f175ba7a355fa71bf31f6ef914fc39d5118619f516e')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/$_tag.tar.gz")
+sha256sums=('e9359a6d7371ce6d509c7c391e0ba005d24f03911a017a619c89bce42bf019ba')
 
 package() {
-    cd "$srcdir/${url##*/}-$pkgver"
+    cd "$srcdir/${url##*/}-${_tag#v}/widgets/corestrip"
 
     local appletdir="$pkgdir/usr/share/plasma/plasmoids/io.github.stektus.corestrip"
     install -dm755 "$appletdir"
@@ -29,5 +29,6 @@ package() {
     find "$appletdir" -type f -exec chmod 644 {} +
     find "$appletdir" -type d -exec chmod 755 {} +
 
-    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    install -Dm644 "$srcdir/${url##*/}-${_tag#v}/LICENSE" \
+        "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
