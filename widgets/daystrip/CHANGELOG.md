@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1
+
+- The conditions in the popup header follow the popup's weather switch, and
+  the panel keeps a small icon when nothing is selected.
+
 ## 1.0.0
 
 First release.

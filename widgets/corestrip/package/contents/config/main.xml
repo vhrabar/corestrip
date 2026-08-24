@@ -44,6 +44,9 @@
         </entry>
 
         <!-- Popup sections -->
+        <entry name="popupCpu" type="Bool">
+            <default>true</default>
+        </entry>
         <entry name="popupCores" type="Bool">
             <default>true</default>
         </entry>

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- The volume target no longer gets cut off in the settings list.
+
 ## 1.0.0
 
 First release.

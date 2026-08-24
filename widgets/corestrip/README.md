@@ -71,9 +71,10 @@ panel too short for two lines of the chosen size uses one. Widths are reserved f
 applet never resizes the panel while numbers change.
 
 **Details** — which sections the popup shows: per-core load, graphics cards,
-memory, network, storage, battery, top processes. Network and storage can
-each be broken down instead of shown as one merged total: network per
-interface, storage per partition or pinned to one chosen "main" partition.
+memory, network, storage, battery, top processes. Switching a section off takes its
+ring out of the summary strip too;with nothing left on, the popup says where the switches are. 
+Network and storage can each be broken down instead of shown as one merged total: network per
+interface, storage per partition or pinned to one chosen "main" partition. 
 
 ## What it reads
 
@@ -107,7 +108,7 @@ release, so the file on the store and the file on the release page are the
 same build.
 
 For Arch/Manjaro users, [packaging/aur/](packaging/aur/) holds a ready
-`PKGBUILD` and `.SRCINFO` pinned to the v1.1.0 release tarball — copy both into
+`PKGBUILD` and `.SRCINFO` pinned to the v1.1.1 release tarball — copy both into
 a clone of the AUR repository and push. Once published, Manjaro's *Add/Remove
 Software* installs it like any other package when AUR support is enabled.
 

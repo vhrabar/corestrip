@@ -8,8 +8,8 @@
 # bump both, then run `updpkgsums` and `makepkg --printsrcinfo > .SRCINFO`.
 #
 pkgname=plasma6-applets-corestrip
-_tag=v1.1.0
-pkgver=1.1.0
+_tag=v1.1.1
+pkgver=1.1.1
 pkgrel=1
 pkgdesc="Plasma 6 panel widget for CPU, GPU, memory and network load"
 arch=('any')
@@ -18,7 +18,7 @@ license=('MIT')
 depends=('plasma-workspace' 'ksystemstats' 'libksysguard')
 optdepends=('nvidia-utils: NVIDIA GPU readings')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/$_tag.tar.gz")
-sha256sums=('e9359a6d7371ce6d509c7c391e0ba005d24f03911a017a619c89bce42bf019ba')
+sha256sums=('13fc470c5bff960406c1dff5ac1095418a7db70cda6b862825bcda7e3ddfccce')
 
 package() {
     cd "$srcdir/${url##*/}-${_tag#v}/widgets/corestrip"

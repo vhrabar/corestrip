@@ -7,6 +7,14 @@
   either every mounted partition or just one pinned "main" partition.
   Merged stays the default for both.
 
+## 1.1.1
+
+- Popup sections switch off completely: the summary rings on top follow the
+  same switches, and the processor section has one of its own instead of only
+  its per-core grid ([#1](https://github.com/stektus/corestrip/issues/1)).
+- With every panel gauge switched off the widget keeps a small icon rather
+  than becoming an invisible gap that cannot be clicked or configured.
+
 ## 1.1.0
 
 - Text size setting (50–150 %) that scales the readouts and the gauges
