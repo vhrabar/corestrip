@@ -17,12 +17,24 @@ QtObject {
     /* Panel gauges can ask for sensors the popup would otherwise own. */
     property bool panelDisk: false
     property int historyLength: 60
+    /* Whether the popup should show Storage per partition imstead of one merged total */
+    property bool diskSeparated: false
 
     /* Discovered at runtime: ids differ per machine (GPUs, batteries, cores). */
     readonly property var gpus: inventory.gpus
     readonly property var batteries: inventory.batteries
     readonly property int coreCount: inventory.coreCount
     readonly property var coreIds: inventory.coreIds
+    readonly property var disks: inventory.disks
+
+    /* The partition shown in "main" mode. */
+    property string mainDiskId: disks.length > 0 ? disks[0].id : ""
+    readonly property int mainDiskIndex: {
+        for (var i = 0; i < disks.length; i++)
+            if (disks[i].id === mainDiskId)
+                return i
+        return disks.length > 0 ? 0 : -1
+    }
 
     readonly property bool hasGpu: gpus.length > 0
     readonly property bool hasBattery: batteries.length > 0
@@ -158,6 +170,28 @@ QtObject {
     readonly property Sensors.Sensor diskTotal: Sensors.Sensor {
         sensorId: "disk/all/total"
         enabled: backend.detailed
+    }
+
+    /* Per-partition rates and capacity */
+    readonly property Sensors.SensorDataModel diskReadModel: Sensors.SensorDataModel {
+        sensors: backend.disks.map(function (d) { return d.id + "/read" })
+        enabled: backend.detailed && backend.diskSeparated && backend.disks.length > 0
+        updateRateLimit: backend.interval
+    }
+    readonly property Sensors.SensorDataModel diskWriteModel: Sensors.SensorDataModel {
+        sensors: backend.disks.map(function (d) { return d.id + "/write" })
+        enabled: backend.detailed && backend.diskSeparated && backend.disks.length > 0
+        updateRateLimit: backend.interval
+    }
+    readonly property Sensors.SensorDataModel diskUsedModel: Sensors.SensorDataModel {
+        sensors: backend.disks.map(function (d) { return d.id + "/used" })
+        enabled: backend.detailed && backend.diskSeparated && backend.disks.length > 0
+        updateRateLimit: backend.interval
+    }
+    readonly property Sensors.SensorDataModel diskCapacityModel: Sensors.SensorDataModel {
+        sensors: backend.disks.map(function (d) { return d.id + "/total" })
+        enabled: backend.detailed && backend.diskSeparated && backend.disks.length > 0
+        updateRateLimit: backend.interval
     }
 
     // ------------------------------------------------------------------ GPU

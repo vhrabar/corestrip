@@ -15,11 +15,18 @@ PlasmoidItem {
         interval: Math.max(500, Plasmoid.configuration.updateInterval)
         detailed: root.expanded
         panelDisk: Plasmoid.configuration.showDisk
+        diskSeparated: Plasmoid.configuration.diskMode !== "merged"
         panelGpuId: {
             var configured = Plasmoid.configuration.panelGpu
             if (configured && configured !== "auto")
                 return configured
             return sensorBackend.gpus.length > 0 ? sensorBackend.gpus[0].id : ""
+        }
+        mainDiskId: {
+            var configured = Plasmoid.configuration.mainDisk
+            if (configured && configured !== "auto")
+                return configured
+            return sensorBackend.disks.length > 0 ? sensorBackend.disks[0].id : ""
         }
     }
 

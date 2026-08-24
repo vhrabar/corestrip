@@ -460,10 +460,12 @@ Item {
                     title: "Storage"
                     accentColor: Util.accent.disk
                     visible: Plasmoid.configuration.popupDisk
-                    headline: Util.percent(full.backend.diskUsedPercent.value)
+                    headline: Plasmoid.configuration.diskMode === "merged"
+                              ? Util.percent(full.backend.diskUsedPercent.value) : ""
 
                     MeterBar {
                         Layout.fillWidth: true
+                        visible: Plasmoid.configuration.diskMode === "merged"
                         value: Util.clamp01(full.backend.diskUsedPercent.value / 100)
                         barColor: Util.loadColor(Util.accent.disk,
                                                  full.backend.diskUsedPercent.value / 100)
@@ -474,6 +476,7 @@ Item {
                         columns: 2
                         columnSpacing: Kirigami.Units.largeSpacing
                         rowSpacing: Kirigami.Units.smallSpacing
+                        visible: Plasmoid.configuration.diskMode === "merged"
 
                         StatLine {
                             label: "Used"
@@ -487,6 +490,15 @@ Item {
                             value: Util.bytes(full.backend.diskTotal.value - full.backend.diskUsed.value)
                             valueSample: "999.9 GiB"
                         }
+                    }
+
+                    GridLayout {
+                        Layout.fillWidth: true
+                        columns: 2
+                        columnSpacing: Kirigami.Units.largeSpacing
+                        rowSpacing: Kirigami.Units.smallSpacing
+                        visible: Plasmoid.configuration.diskMode === "merged"
+
                         StatLine {
                             label: "Read"
                             value: Util.rate(full.backend.diskRead.value)
@@ -496,6 +508,45 @@ Item {
                             label: "Write"
                             value: Util.rate(full.backend.diskWrite.value)
                             valueSample: "999.9 MiB/s"
+                        }
+                    }
+
+                    /* "separated": every mounted partition. */
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        Layout.topMargin: Kirigami.Units.smallSpacing
+                        spacing: Kirigami.Units.smallSpacing
+                        visible: Plasmoid.configuration.diskMode === "separated"
+                                 && full.backend.disks.length > 0
+
+                        Repeater {
+                            model: full.backend.disks
+
+                            DiskRow {
+                                required property var modelData
+                                required property int index
+
+                                backend: full.backend
+                                label: modelData.label
+                                diskIndex: index
+                            }
+                        }
+                    }
+
+                    /* "main": just the first discovered partition — matches
+                       how panelGpuId defaults to the first GPU. */
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        Layout.topMargin: Kirigami.Units.smallSpacing
+                        spacing: Kirigami.Units.smallSpacing
+                        visible: Plasmoid.configuration.diskMode === "main"
+                                 && full.backend.mainDiskIndex >= 0
+
+                        DiskRow {
+                            backend: full.backend
+                            label: full.backend.mainDiskIndex >= 0
+                                   ? full.backend.disks[full.backend.mainDiskIndex].label : ""
+                            diskIndex: full.backend.mainDiskIndex
                         }
                     }
                 }
