@@ -83,14 +83,6 @@ ColumnLayout {
             value: Util.bytes(row.totalCapacity - row.used)
             valueSample: "999.9 GiB"
         }
-    }
-
-    GridLayout {
-        Layout.fillWidth: true
-        columns: 2
-        columnSpacing: Kirigami.Units.largeSpacing
-        rowSpacing: Kirigami.Units.smallSpacing
-
         StatLine {
             label: "Read"
             value: Util.rate(row.read)

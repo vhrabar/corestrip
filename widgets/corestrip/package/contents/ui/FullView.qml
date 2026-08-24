@@ -541,15 +541,6 @@ Item {
                             value: Util.bytes(full.backend.diskTotal.value - full.backend.diskUsed.value)
                             valueSample: "999.9 GiB"
                         }
-                    }
-
-                    GridLayout {
-                        Layout.fillWidth: true
-                        columns: 2
-                        columnSpacing: Kirigami.Units.largeSpacing
-                        rowSpacing: Kirigami.Units.smallSpacing
-                        visible: Plasmoid.configuration.diskMode === "merged"
-
                         StatLine {
                             label: "Read"
                             value: Util.rate(full.backend.diskRead.value)

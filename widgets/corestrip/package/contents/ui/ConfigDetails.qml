@@ -107,6 +107,7 @@ KCM.SimpleKCM {
             }
             currentIndex: Math.max(0, indexOfValue(page.cfg_mainDisk))
             onActivated: page.cfg_mainDisk = currentValue
+            onModelChanged: currentIndex = Math.max(0, indexOfValue(page.cfg_mainDisk))
         }
 
         QQC2.CheckBox {
