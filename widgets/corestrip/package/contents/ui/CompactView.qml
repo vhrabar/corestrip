@@ -160,10 +160,22 @@ MouseArea {
         id: content
 
         anchors.centerIn: parent
-        rows: compact.vertical ? compact.metricKeys.length : 1
-        columns: compact.vertical ? 1 : compact.metricKeys.length
+        rows: compact.vertical ? Math.max(1, compact.metricKeys.length) : 1
+        columns: compact.vertical ? 1 : Math.max(1, compact.metricKeys.length)
         rowSpacing: Kirigami.Units.smallSpacing
         columnSpacing: Kirigami.Units.smallSpacing * 1.5
+
+        /* With every gauge switched off the widget would be a zero-width gap
+           in the panel — impossible to hover, click or configure. A quiet
+           icon keeps it reachable. */
+        Kirigami.Icon {
+            visible: compact.metricKeys.length === 0
+            source: "speedometer"
+            opacity: 0.5
+            Layout.alignment: Qt.AlignCenter
+            Layout.preferredWidth: compact.gaugeSize
+            Layout.preferredHeight: compact.gaugeSize
+        }
 
         Repeater {
             model: compact.metricKeys

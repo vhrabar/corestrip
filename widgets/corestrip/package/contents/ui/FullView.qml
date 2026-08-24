@@ -31,12 +31,27 @@ Item {
         sensorId: "os/system/logo"
     }
 
+    /* The rings on top are the popup's own summary, so they follow the popup's
+       switches: a section that is off has nothing to summarise. */
     readonly property var overviewKeys: {
-        var keys = ["cpu"]
-        if (backend && backend.hasGpu)
+        var keys = []
+        var config = Plasmoid.configuration
+        if (config.popupCpu)
+            keys.push("cpu")
+        if (config.popupGpu && backend && backend.hasGpu)
             keys.push("gpu")
-        keys.push("memory")
+        if (config.popupMemory)
+            keys.push("memory")
         return keys
+    }
+
+    /* Everything switched off would leave a blank sheet with no way back to
+       the settings, so the popup says where the switches are. */
+    readonly property bool nothingSelected: {
+        var config = Plasmoid.configuration
+        return !config.popupCpu && !config.popupGpu && !config.popupMemory
+               && !config.popupNetwork && !config.popupDisk
+               && !config.popupBattery && !config.popupProcesses
     }
 
     function overviewLabel(key) {
@@ -177,6 +192,7 @@ Item {
             Layout.leftMargin: Kirigami.Units.smallSpacing
             Layout.rightMargin: Kirigami.Units.smallSpacing
             spacing: Kirigami.Units.largeSpacing
+            visible: full.overviewKeys.length > 0
 
             Repeater {
                 model: full.overviewKeys
@@ -255,10 +271,21 @@ Item {
                 width: parent.width
                 spacing: Kirigami.Units.smallSpacing * 2
 
+                PlasmaComponents.Label {
+                    Layout.fillWidth: true
+                    Layout.topMargin: Kirigami.Units.gridUnit * 2
+                    visible: full.nothingSelected
+                    text: "No sections are switched on.\nRight-click the widget → Configure → Details."
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                    opacity: 0.6
+                }
+
                 // ---- CPU
                 Card {
                     title: "Processor"
                     accentColor: Util.accent.cpu
+                    visible: Plasmoid.configuration.popupCpu
                     headline: full.backend.coreCount === 1 ? "1 thread"
                                                            : full.backend.coreCount + " threads"
 

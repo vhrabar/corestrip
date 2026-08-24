@@ -81,9 +81,11 @@ Item {
 
             Item { Layout.fillWidth: true }
 
-            /* Current conditions, right-aligned against the clock. */
+            /* Current conditions, right-aligned against the clock — part of the
+               weather section, so the popup switch takes it with it. */
             RowLayout {
                 visible: full.backend.weather !== null
+                         && Plasmoid.configuration.popupWeather
                 spacing: Kirigami.Units.smallSpacing
 
                 ColumnLayout {

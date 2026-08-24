@@ -9,7 +9,7 @@
 #
 pkgname=plasma6-applets-tunestrip
 _tag=v1.1.0
-pkgver=1.0.0
+pkgver=1.0.1
 pkgrel=1
 pkgdesc="Plasma 6 panel widget for whatever is playing: art, equalizer and controls"
 arch=('any')

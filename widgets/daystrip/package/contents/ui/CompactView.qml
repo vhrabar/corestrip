@@ -190,10 +190,21 @@ MouseArea {
         id: content
 
         anchors.centerIn: parent
-        rows: compact.vertical ? compact.layoutKeys.length : 1
-        columns: compact.vertical ? 1 : compact.layoutKeys.length
+        rows: compact.vertical ? Math.max(1, compact.layoutKeys.length) : 1
+        columns: compact.vertical ? 1 : Math.max(1, compact.layoutKeys.length)
         rowSpacing: Math.round(Kirigami.Units.smallSpacing / 2)
         columnSpacing: Kirigami.Units.smallSpacing
+
+        /* Nothing selected would leave a zero-width gap in the panel, with no
+           way to hover or click it; a quiet icon keeps the widget reachable. */
+        Kirigami.Icon {
+            visible: compact.layoutKeys.length === 0
+            source: "clock"
+            opacity: 0.5
+            Layout.alignment: Qt.AlignCenter
+            Layout.preferredWidth: Math.round(compact.available)
+            Layout.preferredHeight: Math.round(compact.available)
+        }
 
         Repeater {
             model: compact.layoutKeys

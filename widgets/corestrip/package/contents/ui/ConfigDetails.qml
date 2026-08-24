@@ -7,6 +7,7 @@ import org.kde.kcmutils as KCM
 KCM.SimpleKCM {
     id: page
 
+    property alias cfg_popupCpu: cpuBox.checked
     property alias cfg_popupCores: coresBox.checked
     property alias cfg_popupGpu: gpuBox.checked
     property alias cfg_popupMemory: memoryBox.checked
@@ -19,9 +20,17 @@ KCM.SimpleKCM {
         anchors.fill: parent
 
         QQC2.CheckBox {
-            id: coresBox
+            id: cpuBox
             Kirigami.FormData.label: "Show in popup:"
+            text: "Processor"
+        }
+
+        QQC2.CheckBox {
+            id: coresBox
             text: "Per-core load"
+            /* Part of the processor section, so it goes with it. */
+            enabled: cpuBox.checked
+            leftPadding: Kirigami.Units.gridUnit
         }
 
         QQC2.CheckBox {

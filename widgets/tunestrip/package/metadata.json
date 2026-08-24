@@ -14,7 +14,7 @@
         "Id": "io.github.stektus.tunestrip",
         "License": "MIT",
         "Name": "Tunestrip",
-        "Version": "1.0.0",
+        "Version": "1.0.1",
         "Website": "https://github.com/stektus/corestrip"
     },
     "X-Plasma-API-Minimum-Version": "6.0"
