@@ -12,6 +12,7 @@ QtObject {
     property var gpus: []
     property var batteries: []
     property var coreIds: []
+    property var networkInterfaces: []
     property var disks: []
     readonly property int coreCount: coreIds.length
 
@@ -66,6 +67,10 @@ QtObject {
         var foundBatteries = objectsOf("power")
         if (JSON.stringify(foundBatteries) !== JSON.stringify(batteries))
             batteries = foundBatteries
+
+        var foundInterfaces = objectsOf("network")
+        if (JSON.stringify(foundInterfaces) !== JSON.stringify(networkInterfaces))
+            networkInterfaces = foundInterfaces
 
         var foundDisks = objectsOf("disk", "usedPercent").filter(function (d) { return d.hasCapacity })
         if (JSON.stringify(foundDisks) !== JSON.stringify(disks))

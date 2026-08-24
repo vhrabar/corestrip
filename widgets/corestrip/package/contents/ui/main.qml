@@ -15,6 +15,7 @@ PlasmoidItem {
         interval: Math.max(500, Plasmoid.configuration.updateInterval)
         detailed: root.expanded
         panelDisk: Plasmoid.configuration.showDisk
+        networkSeparated: Plasmoid.configuration.networkMode === "separated"
         diskSeparated: Plasmoid.configuration.diskMode !== "merged"
         panelGpuId: {
             var configured = Plasmoid.configuration.panelGpu

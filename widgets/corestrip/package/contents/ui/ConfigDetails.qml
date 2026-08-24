@@ -11,6 +11,7 @@ KCM.SimpleKCM {
     property alias cfg_popupGpu: gpuBox.checked
     property alias cfg_popupMemory: memoryBox.checked
     property alias cfg_popupNetwork: networkBox.checked
+    property string cfg_networkMode
     property alias cfg_popupDisk: diskBox.checked
     property string cfg_diskMode
     property string cfg_mainDisk
@@ -43,6 +44,20 @@ KCM.SimpleKCM {
         QQC2.CheckBox {
             id: networkBox
             text: "Network"
+        }
+
+        QQC2.ComboBox {
+            id: networkModeBox
+            Kirigami.FormData.label: "Network breakdown:"
+            enabled: networkBox.checked
+            textRole: "label"
+            valueRole: "key"
+            model: [
+                { key: "merged", label: "All interfaces merged" },
+                { key: "separated", label: "Each interface separately" }
+            ]
+            currentIndex: Math.max(0, indexOfValue(page.cfg_networkMode))
+            onActivated: page.cfg_networkMode = currentValue
         }
 
         QQC2.CheckBox {

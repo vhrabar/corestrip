@@ -17,6 +17,8 @@ QtObject {
     /* Panel gauges can ask for sensors the popup would otherwise own. */
     property bool panelDisk: false
     property int historyLength: 60
+    /* Whether the popup should show Network per interface instead of one merged total. */
+    property bool networkSeparated: false
     /* Whether the popup should show Storage per partition imstead of one merged total */
     property bool diskSeparated: false
 
@@ -25,6 +27,7 @@ QtObject {
     readonly property var batteries: inventory.batteries
     readonly property int coreCount: inventory.coreCount
     readonly property var coreIds: inventory.coreIds
+    readonly property var networkInterfaces: inventory.networkInterfaces
     readonly property var disks: inventory.disks
 
     /* The partition shown in "main" mode. */
@@ -146,6 +149,28 @@ QtObject {
         enabled: backend.detailed
     }
 
+    /* Per-interface rates and cumulative totals */
+    readonly property Sensors.SensorDataModel netDownModel: Sensors.SensorDataModel {
+        sensors: backend.networkInterfaces.map(function (i) { return i.id + "/download" })
+        enabled: backend.detailed && backend.networkSeparated && backend.networkInterfaces.length > 0
+        updateRateLimit: backend.interval
+    }
+    readonly property Sensors.SensorDataModel netUpModel: Sensors.SensorDataModel {
+        sensors: backend.networkInterfaces.map(function (i) { return i.id + "/upload" })
+        enabled: backend.detailed && backend.networkSeparated && backend.networkInterfaces.length > 0
+        updateRateLimit: backend.interval
+    }
+    readonly property Sensors.SensorDataModel netTotalDownModel: Sensors.SensorDataModel {
+        sensors: backend.networkInterfaces.map(function (i) { return i.id + "/totalDownload" })
+        enabled: backend.detailed && backend.networkSeparated && backend.networkInterfaces.length > 0
+        updateRateLimit: backend.interval
+    }
+    readonly property Sensors.SensorDataModel netTotalUpModel: Sensors.SensorDataModel {
+        sensors: backend.networkInterfaces.map(function (i) { return i.id + "/totalUpload" })
+        enabled: backend.detailed && backend.networkSeparated && backend.networkInterfaces.length > 0
+        updateRateLimit: backend.interval
+    }
+
     // ----------------------------------------------------------------- Disk
     readonly property Sensors.Sensor diskRead: Sensors.Sensor {
         sensorId: "disk/all/read"
@@ -256,6 +281,11 @@ QtObject {
     property real netPeak: 1
     property real diskPeak: 1
 
+    /* One ring buffer + peak per discovered interface */
+    property var netIfDownHistory: []
+    property var netIfUpHistory: []
+    property var netIfPeak: []
+
     function pushSample(buffer, value) {
         var v = (value === undefined || value === null || isNaN(value)) ? 0 : value
         buffer.push(v)
@@ -283,7 +313,34 @@ QtObject {
             diskMax = Math.max(diskMax, diskReadHistory[j], diskWriteHistory[j])
         diskPeak = diskMax
 
+        if (networkSeparated)
+            sampleDevices(networkInterfaces, netDownModel, netUpModel, netIfDownHistory, netIfUpHistory, netIfPeak)
+
         historyTick++
+    }
+
+    /* Samples one reading per discovered device */
+    function sampleDevices(ids, modelA, modelB, historyA, historyB, peaks) {
+        while (historyA.length < ids.length) {
+            historyA.push([])
+            historyB.push([])
+            peaks.push(1)
+        }
+        historyA.length = ids.length
+        historyB.length = ids.length
+        peaks.length = ids.length
+
+        for (var i = 0; i < ids.length; i++) {
+            var a = i < modelA.columnCount() ? modelA.data(modelA.index(0, i), Sensors.SensorDataModel.Value) : 0
+            var b = i < modelB.columnCount() ? modelB.data(modelB.index(0, i), Sensors.SensorDataModel.Value) : 0
+            pushSample(historyA[i], a)
+            pushSample(historyB[i], b)
+
+            var p = 1
+            for (var k = 0; k < historyA[i].length; k++)
+                p = Math.max(p, historyA[i][k], historyB[i][k])
+            peaks[i] = p
+        }
     }
 
     readonly property Timer sampler: Timer {

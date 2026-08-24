@@ -390,11 +390,13 @@ Item {
                     title: "Network"
                     accentColor: Util.accent.network
                     visible: Plasmoid.configuration.popupNetwork
-                    headline: Util.rate(full.backend.netDown.value + full.backend.netUp.value)
+                    headline: Plasmoid.configuration.networkMode === "separated"
+                              ? "" : Util.rate(full.backend.netDown.value + full.backend.netUp.value)
 
                     Item {
                         Layout.fillWidth: true
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2.8
+                        visible: Plasmoid.configuration.networkMode !== "separated"
 
                         Sparkline {
                             anchors.left: parent.left
@@ -427,6 +429,7 @@ Item {
                         columns: 2
                         columnSpacing: Kirigami.Units.largeSpacing
                         rowSpacing: Kirigami.Units.smallSpacing
+                        visible: Plasmoid.configuration.networkMode !== "separated"
 
                         StatLine {
                             label: "Download"
@@ -451,6 +454,27 @@ Item {
                             label: "Sent"
                             value: Util.bytes(full.backend.netTotalUp.value)
                             valueSample: "999.9 GiB"
+                        }
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        Layout.topMargin: Kirigami.Units.smallSpacing
+                        spacing: Kirigami.Units.smallSpacing
+                        visible: Plasmoid.configuration.networkMode === "separated"
+                                 && full.backend.networkInterfaces.length > 0
+
+                        Repeater {
+                            model: full.backend.networkInterfaces
+
+                            NetworkInterfaceRow {
+                                required property var modelData
+                                required property int index
+
+                                backend: full.backend
+                                label: modelData.label
+                                interfaceIndex: index
+                            }
                         }
                     }
                 }

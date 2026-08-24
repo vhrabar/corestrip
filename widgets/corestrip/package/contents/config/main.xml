@@ -56,6 +56,9 @@
         <entry name="popupNetwork" type="Bool">
             <default>true</default>
         </entry>
+        <entry name="networkMode" type="String">
+            <default>merged</default>
+        </entry>
         <entry name="popupDisk" type="Bool">
             <default>true</default>
         </entry>
