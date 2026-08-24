@@ -71,19 +71,21 @@ panel too short for two lines of the chosen size uses one. Widths are reserved f
 applet never resizes the panel while numbers change.
 
 **Details** — which sections the popup shows: per-core load, graphics cards,
-memory, network, storage, battery, top processes.
+memory, network, storage, battery, top processes. Network and storage can
+each be broken down instead of shown as one merged total: network per
+interface, storage per partition or pinned to one chosen "main" partition.
 
 ## What it reads
 
-| Section    | Sensors |
-|------------|---------|
-| Processor  | `cpu/all/{usage,user,system}`, `cpu/cpuN/{usage,frequency}`, `cpu/cpu0/temperature` |
-| Graphics   | `gpu/gpuN/{usage,temperature,power,coreFrequency,usedVram,totalVram}` |
-| Memory     | `memory/physical/*`, `memory/swap/*` |
-| Network    | `network/all/{download,upload,totalDownload,totalUpload}` |
-| Storage    | `disk/all/{read,write,used,total,usedPercent}` |
-| Battery    | `power/<id>/{chargePercentage,chargeRate,health}` |
-| Processes  | `ProcessDataModel` (name, CPU usage, memory) |
+| Section   | Sensors                                                                                                           |
+|-----------|-------------------------------------------------------------------------------------------------------------------|
+| Processor | `cpu/all/{usage,user,system}`, `cpu/cpuN/{usage,frequency}`, `cpu/cpu0/temperature`                               |
+| Graphics  | `gpu/gpuN/{usage,temperature,power,coreFrequency,usedVram,totalVram}`                                             |
+| Memory    | `memory/physical/*`, `memory/swap/*`                                                                              |
+| Network   | `network/all/{download,upload,totalDownload,totalUpload}`, or per interface (`network/<id>/...`) when broken down |
+| Storage   | `disk/all/{read,write,used,total,usedPercent}`, or per partition (`disk/<id>/...`) when broken down               |
+| Battery   | `power/<id>/{chargePercentage,chargeRate,health}`                                                                 |
+| Processes | `ProcessDataModel` (name, CPU usage, memory)                                                                      |
 
 ## Packaging and publishing
 

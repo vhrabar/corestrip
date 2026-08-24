@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+- Network and Storage cards can break their totals down instead of only
+  showing one merged number: every network interface separately, and
+  either every mounted partition or just one pinned "main" partition.
+  Merged stays the default for both.
+
 ## 1.1.0
 
 - Text size setting (50–150 %) that scales the readouts and the gauges

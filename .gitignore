@@ -5,5 +5,3 @@ src/
 *.pkg.tar.*
 *.tar.gz
 dist/
-
-.idea/
