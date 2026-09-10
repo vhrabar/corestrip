@@ -59,8 +59,17 @@
         <entry name="popupNetwork" type="Bool">
             <default>true</default>
         </entry>
+        <entry name="networkMode" type="String">
+            <default>merged</default>
+        </entry>
         <entry name="popupDisk" type="Bool">
             <default>true</default>
+        </entry>
+        <entry name="diskMode" type="String">
+            <default>merged</default>
+        </entry>
+        <entry name="mainDisk" type="String">
+            <default>auto</default>
         </entry>
         <entry name="popupBattery" type="Bool">
             <default>true</default>

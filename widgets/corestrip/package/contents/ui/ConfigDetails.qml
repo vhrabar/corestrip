@@ -12,9 +12,16 @@ KCM.SimpleKCM {
     property alias cfg_popupGpu: gpuBox.checked
     property alias cfg_popupMemory: memoryBox.checked
     property alias cfg_popupNetwork: networkBox.checked
+    property string cfg_networkMode
     property alias cfg_popupDisk: diskBox.checked
+    property string cfg_diskMode
+    property string cfg_mainDisk
     property alias cfg_popupBattery: batteryBox.checked
     property alias cfg_popupProcesses: processesBox.checked
+
+    SensorInventory {
+        id: inventory
+    }
 
     Kirigami.FormLayout {
         anchors.fill: parent
@@ -48,9 +55,59 @@ KCM.SimpleKCM {
             text: "Network"
         }
 
+        QQC2.ComboBox {
+            id: networkModeBox
+            Kirigami.FormData.label: "Network breakdown:"
+            enabled: networkBox.checked
+            textRole: "label"
+            valueRole: "key"
+            model: [
+                { key: "merged", label: "All interfaces merged" },
+                { key: "separated", label: "Each interface separately" }
+            ]
+            currentIndex: Math.max(0, indexOfValue(page.cfg_networkMode))
+            onActivated: page.cfg_networkMode = currentValue
+        }
+
         QQC2.CheckBox {
             id: diskBox
             text: "Storage"
+        }
+
+        QQC2.ComboBox {
+            id: diskModeBox
+            Kirigami.FormData.label: "Storage breakdown:"
+            enabled: diskBox.checked
+            textRole: "label"
+            valueRole: "key"
+            model: [
+                { key: "merged", label: "All disks merged" },
+                { key: "separated", label: "Each partition separately" },
+                { key: "main", label: "Only main partition" }
+            ]
+            currentIndex: Math.max(0, indexOfValue(page.cfg_diskMode))
+            onActivated: page.cfg_diskMode = currentValue
+        }
+
+        QQC2.ComboBox {
+            id: mainDiskBox
+            Kirigami.FormData.label: "Main partition:"
+            enabled: diskBox.checked && diskModeBox.currentValue === "main"
+            textRole: "label"
+            valueRole: "key"
+            model: {
+                var entries = [{ key: "auto", label: "Automatic" }]
+                for (var i = 0; i < inventory.disks.length; i++) {
+                    entries.push({
+                        key: inventory.disks[i].id,
+                        label: inventory.disks[i].label
+                    })
+                }
+                return entries
+            }
+            currentIndex: Math.max(0, indexOfValue(page.cfg_mainDisk))
+            onActivated: page.cfg_mainDisk = currentValue
+            onModelChanged: currentIndex = Math.max(0, indexOfValue(page.cfg_mainDisk))
         }
 
         QQC2.CheckBox {

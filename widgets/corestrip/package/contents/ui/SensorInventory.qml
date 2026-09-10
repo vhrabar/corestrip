@@ -12,17 +12,20 @@ QtObject {
     property var gpus: []
     property var batteries: []
     property var coreIds: []
+    property var networkInterfaces: []
+    property var disks: []
     readonly property int coreCount: coreIds.length
 
     readonly property Sensors.SensorTreeModel tree: Sensors.SensorTreeModel {}
 
-    function objectsOf(subsystem) {
+    function objectsOf(subsystem, capabilityLeaf) {
         var out = []
         for (var i = 0; i < tree.rowCount(); i++) {
             var subsystemIdx = tree.index(i, 0)
             for (var j = 0; j < tree.rowCount(subsystemIdx); j++) {
                 var objectIdx = tree.index(j, 0, subsystemIdx)
-                if (tree.rowCount(objectIdx) === 0)
+                var childCount = tree.rowCount(objectIdx)
+                if (childCount === 0)
                     continue
                 var leafId = tree.data(tree.index(0, 0, objectIdx),
                                        Sensors.SensorTreeModel.SensorId)
@@ -35,7 +38,22 @@ QtObject {
                 /* Skip the "all" aggregate and the regex group rows. */
                 if (parts[1] === "all" || objectId.indexOf("(") >= 0 || objectId.indexOf("\\") >= 0)
                     continue
-                out.push({ id: objectId, label: String(tree.data(objectIdx, Qt.DisplayRole)) })
+
+                var entry = { id: objectId, label: String(tree.data(objectIdx, Qt.DisplayRole)) }
+
+                if (capabilityLeaf) {
+                    var wanted = objectId + "/" + capabilityLeaf
+                    var has = false
+                    for (var k = 0; k < childCount; k++) {
+                        if (tree.data(tree.index(k, 0, objectIdx), Sensors.SensorTreeModel.SensorId) === wanted) {
+                            has = true
+                            break
+                        }
+                    }
+                    entry.hasCapacity = has
+                }
+
+                out.push(entry)
             }
         }
         return out
@@ -49,6 +67,17 @@ QtObject {
         var foundBatteries = objectsOf("power")
         if (JSON.stringify(foundBatteries) !== JSON.stringify(batteries))
             batteries = foundBatteries
+
+        /* Filter container bridges, veth pairs and the loopbacks. */
+        var foundInterfaces = objectsOf("network").filter(function (object) {
+            return !/^network\/(lo|docker\d*|br-.*|virbr\d*|veth.*|podman\d*|cni\d*)$/.test(object.id)
+        })
+        if (JSON.stringify(foundInterfaces) !== JSON.stringify(networkInterfaces))
+            networkInterfaces = foundInterfaces
+
+        var foundDisks = objectsOf("disk", "usedPercent").filter(function (d) { return d.hasCapacity })
+        if (JSON.stringify(foundDisks) !== JSON.stringify(disks))
+            disks = foundDisks
 
         var cores = objectsOf("cpu").filter(function (object) {
             return /^cpu\/cpu\d+$/.test(object.id)

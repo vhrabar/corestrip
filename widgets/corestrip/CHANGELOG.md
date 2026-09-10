@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0
+
+- Network and Storage cards can break their totals down instead of only
+  showing one merged number: every network interface separately, and
+  either every mounted partition or just one pinned "main" partition.
+  Merged stays the default for both.
+
 ## 1.1.1
 
 - Popup sections switch off completely: the summary rings on top follow the

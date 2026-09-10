@@ -417,11 +417,13 @@ Item {
                     title: "Network"
                     accentColor: Util.accent.network
                     visible: Plasmoid.configuration.popupNetwork
-                    headline: Util.rate(full.backend.netDown.value + full.backend.netUp.value)
+                    headline: Plasmoid.configuration.networkMode === "separated"
+                              ? "" : Util.rate(full.backend.netDown.value + full.backend.netUp.value)
 
                     Item {
                         Layout.fillWidth: true
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2.8
+                        visible: Plasmoid.configuration.networkMode !== "separated"
 
                         Sparkline {
                             anchors.left: parent.left
@@ -454,6 +456,7 @@ Item {
                         columns: 2
                         columnSpacing: Kirigami.Units.largeSpacing
                         rowSpacing: Kirigami.Units.smallSpacing
+                        visible: Plasmoid.configuration.networkMode !== "separated"
 
                         StatLine {
                             label: "Download"
@@ -480,6 +483,27 @@ Item {
                             valueSample: "999.9 GiB"
                         }
                     }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        Layout.topMargin: Kirigami.Units.smallSpacing
+                        spacing: Kirigami.Units.smallSpacing
+                        visible: Plasmoid.configuration.networkMode === "separated"
+                                 && full.backend.networkInterfaces.length > 0
+
+                        Repeater {
+                            model: full.backend.networkInterfaces
+
+                            NetworkInterfaceRow {
+                                required property var modelData
+                                required property int index
+
+                                backend: full.backend
+                                label: modelData.label
+                                interfaceIndex: index
+                            }
+                        }
+                    }
                 }
 
                 // ---- Disk
@@ -487,10 +511,12 @@ Item {
                     title: "Storage"
                     accentColor: Util.accent.disk
                     visible: Plasmoid.configuration.popupDisk
-                    headline: Util.percent(full.backend.diskUsedPercent.value)
+                    headline: Plasmoid.configuration.diskMode === "merged"
+                              ? Util.percent(full.backend.diskUsedPercent.value) : ""
 
                     MeterBar {
                         Layout.fillWidth: true
+                        visible: Plasmoid.configuration.diskMode === "merged"
                         value: Util.clamp01(full.backend.diskUsedPercent.value / 100)
                         barColor: Util.loadColor(Util.accent.disk,
                                                  full.backend.diskUsedPercent.value / 100)
@@ -501,6 +527,7 @@ Item {
                         columns: 2
                         columnSpacing: Kirigami.Units.largeSpacing
                         rowSpacing: Kirigami.Units.smallSpacing
+                        visible: Plasmoid.configuration.diskMode === "merged"
 
                         StatLine {
                             label: "Used"
@@ -523,6 +550,29 @@ Item {
                             label: "Write"
                             value: Util.rate(full.backend.diskWrite.value)
                             valueSample: "999.9 MiB/s"
+                        }
+                    }
+
+                    /* "separated": every mounted partition.
+                    * "main": just the first discovered partition
+                    */
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        Layout.topMargin: Kirigami.Units.smallSpacing
+                        spacing: Kirigami.Units.smallSpacing
+                        visible: full.backend.shownDisks.length > 0
+
+                        Repeater {
+                            model: full.backend.shownDisks
+
+                            DiskRow {
+                                required property var modelData
+                                required property int index
+
+                                backend: full.backend
+                                label: modelData.label
+                                diskIndex: index
+                            }
                         }
                     }
                 }
