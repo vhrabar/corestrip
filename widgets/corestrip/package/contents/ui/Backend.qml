@@ -213,7 +213,7 @@ QtObject {
         enabled: backend.detailed
     }
 
-    /* Per-partition rates and capacity*/
+    /* Per-partition rates and capacity */
     readonly property Sensors.SensorDataModel diskReadModel: Sensors.SensorDataModel {
         sensors: backend.detailed
                  ? backend.shownDisks.map(function (d) { return d.id + "/read" })

@@ -37,6 +37,11 @@ A `.plasmoid` bundle is what store.kde.org and Plasma's *Get New Widgets*
 accept. Pushing a `v*` tag builds every bundle in CI and attaches them to the
 GitHub release.
 
+Every push and pull request runs `tools/check-versions.sh`, which insists that
+each widget's `metadata.json` version and the newest heading in its changelog
+say the same thing — that version is what *Get New Widgets* compares, so a
+bundle must never go out labelled with a version nobody wrote notes for.
+
 Each widget keeps its own README, changelog, screenshots and packaging under
 `widgets/<name>/`.
 
