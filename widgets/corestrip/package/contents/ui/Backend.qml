@@ -19,8 +19,8 @@ QtObject {
     property int historyLength: 60
     /* Whether the popup should show Network per interface instead of one merged total. */
     property bool networkSeparated: false
-    /* Whether the popup should show Storage per partition imstead of one merged total */
-    property bool diskSeparated: false
+    /* Whether the popup shows Storage: "merged", "separated" (every partition) or "main" (one pinned partition). */
+    property string diskMode: "merged"
 
     /* Discovered at runtime: ids differ per machine (GPUs, batteries, cores). */
     readonly property var gpus: inventory.gpus
@@ -38,6 +38,10 @@ QtObject {
                 return i
         return disks.length > 0 ? 0 : -1
     }
+    /* The partitions the popup breaks Storage down into */
+    readonly property var shownDisks: diskMode === "separated" ? disks
+                                    : diskMode === "main" && mainDiskIndex >= 0 ? [disks[mainDiskIndex]]
+                                    : []
 
     readonly property bool hasGpu: gpus.length > 0
     readonly property bool hasBattery: batteries.length > 0
@@ -149,24 +153,36 @@ QtObject {
         enabled: backend.detailed
     }
 
+    /* Per-device models.  SensorDataModel subscribes only when its sensor list
+       is assigned while enabled, so the lists follow the same gate as `enabled`
+       instead of filling as soon as the inventory finds the devices. */
+
     /* Per-interface rates and cumulative totals */
     readonly property Sensors.SensorDataModel netDownModel: Sensors.SensorDataModel {
-        sensors: backend.networkInterfaces.map(function (i) { return i.id + "/download" })
+        sensors: backend.detailed && backend.networkSeparated
+                 ? backend.networkInterfaces.map(function (i) { return i.id + "/download" })
+                 : []
         enabled: backend.detailed && backend.networkSeparated && backend.networkInterfaces.length > 0
         updateRateLimit: backend.interval
     }
     readonly property Sensors.SensorDataModel netUpModel: Sensors.SensorDataModel {
-        sensors: backend.networkInterfaces.map(function (i) { return i.id + "/upload" })
+        sensors: backend.detailed && backend.networkSeparated
+                 ? backend.networkInterfaces.map(function (i) { return i.id + "/upload" })
+                 : []
         enabled: backend.detailed && backend.networkSeparated && backend.networkInterfaces.length > 0
         updateRateLimit: backend.interval
     }
     readonly property Sensors.SensorDataModel netTotalDownModel: Sensors.SensorDataModel {
-        sensors: backend.networkInterfaces.map(function (i) { return i.id + "/totalDownload" })
+        sensors: backend.detailed && backend.networkSeparated
+                 ? backend.networkInterfaces.map(function (i) { return i.id + "/totalDownload" })
+                 : []
         enabled: backend.detailed && backend.networkSeparated && backend.networkInterfaces.length > 0
         updateRateLimit: backend.interval
     }
     readonly property Sensors.SensorDataModel netTotalUpModel: Sensors.SensorDataModel {
-        sensors: backend.networkInterfaces.map(function (i) { return i.id + "/totalUpload" })
+        sensors: backend.detailed && backend.networkSeparated
+                 ? backend.networkInterfaces.map(function (i) { return i.id + "/totalUpload" })
+                 : []
         enabled: backend.detailed && backend.networkSeparated && backend.networkInterfaces.length > 0
         updateRateLimit: backend.interval
     }
@@ -197,25 +213,33 @@ QtObject {
         enabled: backend.detailed
     }
 
-    /* Per-partition rates and capacity */
+    /* Per-partition rates and capacity*/
     readonly property Sensors.SensorDataModel diskReadModel: Sensors.SensorDataModel {
-        sensors: backend.disks.map(function (d) { return d.id + "/read" })
-        enabled: backend.detailed && backend.diskSeparated && backend.disks.length > 0
+        sensors: backend.detailed
+                 ? backend.shownDisks.map(function (d) { return d.id + "/read" })
+                 : []
+        enabled: backend.detailed && backend.shownDisks.length > 0
         updateRateLimit: backend.interval
     }
     readonly property Sensors.SensorDataModel diskWriteModel: Sensors.SensorDataModel {
-        sensors: backend.disks.map(function (d) { return d.id + "/write" })
-        enabled: backend.detailed && backend.diskSeparated && backend.disks.length > 0
+        sensors: backend.detailed
+                 ? backend.shownDisks.map(function (d) { return d.id + "/write" })
+                 : []
+        enabled: backend.detailed && backend.shownDisks.length > 0
         updateRateLimit: backend.interval
     }
     readonly property Sensors.SensorDataModel diskUsedModel: Sensors.SensorDataModel {
-        sensors: backend.disks.map(function (d) { return d.id + "/used" })
-        enabled: backend.detailed && backend.diskSeparated && backend.disks.length > 0
+        sensors: backend.detailed
+                 ? backend.shownDisks.map(function (d) { return d.id + "/used" })
+                 : []
+        enabled: backend.detailed && backend.shownDisks.length > 0
         updateRateLimit: backend.interval
     }
     readonly property Sensors.SensorDataModel diskCapacityModel: Sensors.SensorDataModel {
-        sensors: backend.disks.map(function (d) { return d.id + "/total" })
-        enabled: backend.detailed && backend.diskSeparated && backend.disks.length > 0
+        sensors: backend.detailed
+                 ? backend.shownDisks.map(function (d) { return d.id + "/total" })
+                 : []
+        enabled: backend.detailed && backend.shownDisks.length > 0
         updateRateLimit: backend.interval
     }
 
@@ -285,6 +309,21 @@ QtObject {
     property var netIfDownHistory: []
     property var netIfUpHistory: []
     property var netIfPeak: []
+
+    /* One reading from a per-device model */
+    function modelValue(model, column) {
+        var reactOnTick = historyTick
+        if (column < 0 || column >= model.columnCount())
+            return NaN
+        var v = model.data(model.index(0, column), Sensors.SensorDataModel.Value)
+        return (v === undefined || v === null) ? NaN : v
+    }
+
+    /* One per-device history entry */
+    function deviceHistory(list, index, fallback) {
+        var reactOnTick = historyTick
+        return index >= 0 && index < list.length ? list[index] : fallback
+    }
 
     function pushSample(buffer, value) {
         var v = (value === undefined || value === null || isNaN(value)) ? 0 : value

@@ -70,11 +70,13 @@ temperature above, value below), short ones fall back to a single
 panel too short for two lines of the chosen size uses one. Widths are reserved for the widest possible value, so the
 applet never resizes the panel while numbers change.
 
-**Details** — which sections the popup shows: per-core load, graphics cards,
-memory, network, storage, battery, top processes. Switching a section off takes its
-ring out of the summary strip too;with nothing left on, the popup says where the switches are. 
-Network and storage can each be broken down instead of shown as one merged total: network per
-interface, storage per partition or pinned to one chosen "main" partition. 
+**Details** — which sections the popup shows: processor (with per-core load
+as a sub-option), graphics cards, memory, network, storage, battery, top
+processes. Switching a section off takes its ring out of the summary strip
+too; with nothing left on, the popup says where the switches are.
+Network and storage can each be broken down instead of shown as one merged
+total: network per interface, storage per partition or pinned to one chosen
+"main" partition.
 
 ## What it reads
 

@@ -3,7 +3,6 @@
 import QtQuick
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-import org.kde.ksysguard.sensors as Sensors
 import "../code/util.js" as Util
 
 ColumnLayout {
@@ -16,53 +15,13 @@ ColumnLayout {
     Layout.fillWidth: true
     spacing: Kirigami.Units.smallSpacing * 2
 
-    readonly property real down: {
-        var reactOnTick = row.backend.historyTick
-        var m = row.backend.netDownModel
-        if (row.interfaceIndex < 0 || row.interfaceIndex >= m.columnCount())
-            return NaN
-        var v = m.data(m.index(0, row.interfaceIndex), Sensors.SensorDataModel.Value)
-        return (v === undefined || v === null) ? NaN : v
-    }
-    readonly property real up: {
-        var reactOnTick = row.backend.historyTick
-        var m = row.backend.netUpModel
-        if (row.interfaceIndex < 0 || row.interfaceIndex >= m.columnCount())
-            return NaN
-        var v = m.data(m.index(0, row.interfaceIndex), Sensors.SensorDataModel.Value)
-        return (v === undefined || v === null) ? NaN : v
-    }
-    readonly property real totalDown: {
-        var reactOnTick = row.backend.historyTick
-        var m = row.backend.netTotalDownModel
-        if (row.interfaceIndex < 0 || row.interfaceIndex >= m.columnCount())
-            return NaN
-        var v = m.data(m.index(0, row.interfaceIndex), Sensors.SensorDataModel.Value)
-        return (v === undefined || v === null) ? NaN : v
-    }
-    readonly property real totalUp: {
-        var reactOnTick = row.backend.historyTick
-        var m = row.backend.netTotalUpModel
-        if (row.interfaceIndex < 0 || row.interfaceIndex >= m.columnCount())
-            return NaN
-        var v = m.data(m.index(0, row.interfaceIndex), Sensors.SensorDataModel.Value)
-        return (v === undefined || v === null) ? NaN : v
-    }
-    readonly property var downHistory: {
-        var reactOnTick = row.backend.historyTick
-        return row.interfaceIndex >= 0 && row.interfaceIndex < row.backend.netIfDownHistory.length
-               ? row.backend.netIfDownHistory[row.interfaceIndex] : []
-    }
-    readonly property var upHistory: {
-        var reactOnTick = row.backend.historyTick
-        return row.interfaceIndex >= 0 && row.interfaceIndex < row.backend.netIfUpHistory.length
-               ? row.backend.netIfUpHistory[row.interfaceIndex] : []
-    }
-    readonly property real peak: {
-        var reactOnTick = row.backend.historyTick
-        return row.interfaceIndex >= 0 && row.interfaceIndex < row.backend.netIfPeak.length
-               ? row.backend.netIfPeak[row.interfaceIndex] : 1
-    }
+    readonly property real down: row.backend.modelValue(row.backend.netDownModel, row.interfaceIndex)
+    readonly property real up: row.backend.modelValue(row.backend.netUpModel, row.interfaceIndex)
+    readonly property real totalDown: row.backend.modelValue(row.backend.netTotalDownModel, row.interfaceIndex)
+    readonly property real totalUp: row.backend.modelValue(row.backend.netTotalUpModel, row.interfaceIndex)
+    readonly property var downHistory: row.backend.deviceHistory(row.backend.netIfDownHistory, row.interfaceIndex, [])
+    readonly property var upHistory: row.backend.deviceHistory(row.backend.netIfUpHistory, row.interfaceIndex, [])
+    readonly property real peak: row.backend.deviceHistory(row.backend.netIfPeak, row.interfaceIndex, 1)
 
     Text {
         Layout.fillWidth: true

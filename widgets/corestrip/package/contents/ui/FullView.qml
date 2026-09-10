@@ -553,16 +553,17 @@ Item {
                         }
                     }
 
-                    /* "separated": every mounted partition. */
+                    /* "separated": every mounted partition.
+                    * "main": just the first discovered partition
+                    */
                     ColumnLayout {
                         Layout.fillWidth: true
                         Layout.topMargin: Kirigami.Units.smallSpacing
                         spacing: Kirigami.Units.smallSpacing
-                        visible: Plasmoid.configuration.diskMode === "separated"
-                                 && full.backend.disks.length > 0
+                        visible: full.backend.shownDisks.length > 0
 
                         Repeater {
-                            model: full.backend.disks
+                            model: full.backend.shownDisks
 
                             DiskRow {
                                 required property var modelData
@@ -572,23 +573,6 @@ Item {
                                 label: modelData.label
                                 diskIndex: index
                             }
-                        }
-                    }
-
-                    /* "main": just the first discovered partition — matches
-                       how panelGpuId defaults to the first GPU. */
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        Layout.topMargin: Kirigami.Units.smallSpacing
-                        spacing: Kirigami.Units.smallSpacing
-                        visible: Plasmoid.configuration.diskMode === "main"
-                                 && full.backend.mainDiskIndex >= 0
-
-                        DiskRow {
-                            backend: full.backend
-                            label: full.backend.mainDiskIndex >= 0
-                                   ? full.backend.disks[full.backend.mainDiskIndex].label : ""
-                            diskIndex: full.backend.mainDiskIndex
                         }
                     }
                 }

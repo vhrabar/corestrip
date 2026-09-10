@@ -68,7 +68,10 @@ QtObject {
         if (JSON.stringify(foundBatteries) !== JSON.stringify(batteries))
             batteries = foundBatteries
 
-        var foundInterfaces = objectsOf("network")
+        /* Filter container bridges, veth pairs and the loopbacks. */
+        var foundInterfaces = objectsOf("network").filter(function (object) {
+            return !/^network\/(lo|docker\d*|br-.*|virbr\d*|veth.*|podman\d*|cni\d*)$/.test(object.id)
+        })
         if (JSON.stringify(foundInterfaces) !== JSON.stringify(networkInterfaces))
             networkInterfaces = foundInterfaces
 

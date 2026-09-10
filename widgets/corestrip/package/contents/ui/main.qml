@@ -16,7 +16,7 @@ PlasmoidItem {
         detailed: root.expanded
         panelDisk: Plasmoid.configuration.showDisk
         networkSeparated: Plasmoid.configuration.networkMode === "separated"
-        diskSeparated: Plasmoid.configuration.diskMode !== "merged"
+        diskMode: Plasmoid.configuration.diskMode
         panelGpuId: {
             var configured = Plasmoid.configuration.panelGpu
             if (configured && configured !== "auto")

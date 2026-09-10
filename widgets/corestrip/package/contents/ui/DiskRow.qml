@@ -3,7 +3,6 @@
 import QtQuick
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-import org.kde.ksysguard.sensors as Sensors
 import "../code/util.js" as Util
 
 ColumnLayout {
@@ -16,38 +15,10 @@ ColumnLayout {
     Layout.fillWidth: true
     spacing: Kirigami.Units.smallSpacing * 2
 
-    readonly property real read: {
-        var reactOnTick = row.backend.historyTick
-        var m = row.backend.diskReadModel
-        if (row.diskIndex < 0 || row.diskIndex >= m.columnCount())
-            return NaN
-        var v = m.data(m.index(0, row.diskIndex), Sensors.SensorDataModel.Value)
-        return (v === undefined || v === null) ? NaN : v
-    }
-    readonly property real write: {
-        var reactOnTick = row.backend.historyTick
-        var m = row.backend.diskWriteModel
-        if (row.diskIndex < 0 || row.diskIndex >= m.columnCount())
-            return NaN
-        var v = m.data(m.index(0, row.diskIndex), Sensors.SensorDataModel.Value)
-        return (v === undefined || v === null) ? NaN : v
-    }
-    readonly property real used: {
-        var reactOnTick = row.backend.historyTick
-        var m = row.backend.diskUsedModel
-        if (row.diskIndex < 0 || row.diskIndex >= m.columnCount())
-            return NaN
-        var v = m.data(m.index(0, row.diskIndex), Sensors.SensorDataModel.Value)
-        return (v === undefined || v === null) ? NaN : v
-    }
-    readonly property real totalCapacity: {
-        var reactOnTick = row.backend.historyTick
-        var m = row.backend.diskCapacityModel
-        if (row.diskIndex < 0 || row.diskIndex >= m.columnCount())
-            return NaN
-        var v = m.data(m.index(0, row.diskIndex), Sensors.SensorDataModel.Value)
-        return (v === undefined || v === null) ? NaN : v
-    }
+    readonly property real read: row.backend.modelValue(row.backend.diskReadModel, row.diskIndex)
+    readonly property real write: row.backend.modelValue(row.backend.diskWriteModel, row.diskIndex)
+    readonly property real used: row.backend.modelValue(row.backend.diskUsedModel, row.diskIndex)
+    readonly property real totalCapacity: row.backend.modelValue(row.backend.diskCapacityModel, row.diskIndex)
     readonly property real usedRatio: row.totalCapacity > 0 ? row.used / row.totalCapacity : 0
 
     Text {

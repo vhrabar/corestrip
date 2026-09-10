@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## 1.2.0
 
 - Network and Storage cards can break their totals down instead of only
   showing one merged number: every network interface separately, and
