@@ -8,7 +8,7 @@
 # bump both, then run `updpkgsums` and `makepkg --printsrcinfo > .SRCINFO`.
 #
 pkgname=plasma6-applets-daystrip
-_tag=v1.1.1
+_tag=v1.2.0
 pkgver=1.0.1
 pkgrel=1
 pkgdesc="Plasma 6 panel widget for the clock, date, weather and calendar"
@@ -17,7 +17,7 @@ url="https://github.com/stektus/corestrip"
 license=('MIT')
 depends=('plasma-workspace')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/$_tag.tar.gz")
-sha256sums=('13fc470c5bff960406c1dff5ac1095418a7db70cda6b862825bcda7e3ddfccce')
+sha256sums=('3001dab977ce1efc5ccc9fe7e72a27f1de952728e103c2f9f96ceb53c8f5b941')
 
 package() {
     cd "$srcdir/${url##*/}-${_tag#v}/widgets/daystrip"

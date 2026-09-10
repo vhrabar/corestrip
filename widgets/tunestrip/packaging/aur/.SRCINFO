@@ -6,7 +6,7 @@ pkgbase = plasma6-applets-tunestrip
 	arch = any
 	license = MIT
 	depends = plasma-workspace
-	source = plasma6-applets-tunestrip-1.0.1.tar.gz::https://github.com/stektus/corestrip/archive/refs/tags/v1.1.1.tar.gz
-	sha256sums = 13fc470c5bff960406c1dff5ac1095418a7db70cda6b862825bcda7e3ddfccce
+	source = plasma6-applets-tunestrip-1.0.1.tar.gz::https://github.com/stektus/corestrip/archive/refs/tags/v1.2.0.tar.gz
+	sha256sums = 3001dab977ce1efc5ccc9fe7e72a27f1de952728e103c2f9f96ceb53c8f5b941
 
 pkgname = plasma6-applets-tunestrip
